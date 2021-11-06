@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useState } from "react";
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -12,6 +13,7 @@ import { Select } from '@material-ui/core';
 import { MenuItem } from '@material-ui/core';
 import FormControl from '@mui/material/FormControl';
 import OutlinedInput from '@mui/material/OutlinedInput';
+import axios from "axios";
 
 function createData(name, taux,status) {
   return { name, taux, status };
@@ -28,6 +30,7 @@ const rows = [
 
 export default function ListeDesCandidatures() {
     const [personName, setPersonName] = React.useState([]);
+    const [candidatures, setCandidatures] = useState([]);
 
 const handleChange = (event) => {
   const {
@@ -72,7 +75,6 @@ const handleChange = (event) => {
   <Select
     labelId="demo-simple-select-label"
     id="demo-simple-select"
-    value={personName}
     onChange={handleChange}
     input={<OutlinedInput label="Tag" />}
   >

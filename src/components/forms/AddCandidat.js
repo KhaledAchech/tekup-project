@@ -15,6 +15,7 @@ import FormControl from '@mui/material/FormControl';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import theme from '../../Theme/theme';
 import { ThemeProvider } from '@material-ui/styles';
+import axios from "axios";
 
 
 // import DatePicker from '@material-ui/pickers'; 
@@ -51,19 +52,80 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function AddCandidat() {
-  const [personName, setPersonName] = React.useState([]);
+  const [academicBackground, setAcademicBackground] = useState("");
+  const [universityName, setUniversityName] = useState("");
+  const [universityYear, setUniversityYear] = useState("");
+
+
 
   const handleChange = (event) => {
     const {
       target: { value },
     } = event;
-    setPersonName(
+    setAcademicBackground(
       // On autofill we get a the stringified value.
       typeof value === 'string' ? value.split(',') : value,
     );
   };
-
-
+    //   CandidatureId = models.AutoField(primary_key=True)
+    // UniversityName = models.CharField(max_length=500)
+    // UniversityYear = models.CharField(max_length=500)
+    // AcademicBackground = models.CharField(max_length=500)
+    // Relev1 = models.CharField(max_length=500)
+    // Relev2 = models.CharField(max_length=500)
+    // Status = models.CharField(max_length=500)
+    // Score = models.CharField(max_length=500)
+   const initialCandidatureState = {
+        CandidatureId: null,
+        UniversityName: "",
+        UniversityYear: "",
+        AcademicBackground: "",
+        Relev1: "",
+        Relev2: "",
+        Status: "en cours",
+        Score : "0%"
+      };
+      const [candidature, setCandidature] = useState(initialCandidatureState);
+      const [submitted, setSubmitted] = useState(false);
+      const handlCandidatureChange = (e) => {
+        const { UniversityName, value } = e.target;
+        setCandidature({ ...candidature, [UniversityName]: value });
+      };
+   const submitCandidature = () => {
+        let data = {
+          UniversityName: universityName,
+          UniversityYear : universityYear,
+          AcademicBackground : academicBackground,
+          Relev1 : "Relev 1 ",
+          Relev2 : "Relev 2 ",
+          Status: "en cours",
+          Score : "0%"
+        };
+        console.log(data)
+        axios
+          .post("http://127.0.0.1:8000/candidature", data)
+          .then((response) => {
+            setCandidature({
+              CandidatureId: response.data.CandidatureId,
+              UniversityName: response.data.UniversityName,
+              UniversityYear: response.data.UniversityYear,
+              AcademicBackground: response.data.AcademicBackground,
+              Relev1: response.data.Relev1,
+              Relev2: response.data.Relev2,
+              Status: response.data.Status,
+              Score : response.data.score,
+            });
+            setSubmitted(true);
+            console.log(response.data);
+          })
+          .catch((e) => {
+            console.error(e);
+          });
+      };
+      const newCandidature = () => {
+        setCandidature(initialCandidatureState);
+        setSubmitted(false);
+      };
   const classes = useStyles();
   return (
     <ThemeProvider theme={theme}>
@@ -73,15 +135,31 @@ export default function AddCandidat() {
         <Typography component="h1" variant="h5">
           Ajouter une candidature : 
         </Typography>
+        {
+          submitted ? (
+            <div>
+              <div>
+                <Typography> Candidature Sauvegarder ! </Typography>
+
+              </div>
+              <Button onClick={newCandidature} color="primary">
+                Créer une nouvelle candidature ^^ .
+              </Button>
+            </div>
+          ) : 
+          (
         <form className={classes.form} noValidate action="#" encType="multipart/form-data">
        
           <TextField
             variant="outlined"
             margin="normal"
             fullWidth
-            id="pastryType"
+            id="UniversityName"
             label="Nom de l'université"
-            name="pastryType"
+            name="UniversityName"
+            required
+            value = {universityName}
+            onChange = { (e) => setUniversityName(e.target.value)}
             autoComplete="Nom de l'université"
           />
  {/* <DatePicker
@@ -94,9 +172,11 @@ export default function AddCandidat() {
             variant="outlined"
             margin="normal"
             fullWidth
-            id="pastryType"
+            id="UniversityYear"
             label="Année universitaire"
-            name="pastryType"
+            name="UniversityYear"
+            value = {universityYear}
+            onChange = { (e) => setUniversityYear(e.target.value)}
             autoComplete="Année universitaire"
           />
            
@@ -104,14 +184,14 @@ export default function AddCandidat() {
            <InputLabel id="demo-simple-select-label">Parcours universitaire : </InputLabel>
   <Select
     labelId="demo-simple-select-label"
-    id="demo-simple-select"
-    value={personName}
-    onChange={handleChange}
+    id="AcademicBackground"
+    // value={candidature.AcademicBackground}
+    onChange={ (e) => setAcademicBackground(e.target.value)}
     input={<OutlinedInput label="Tag" />}
   >
-    <MenuItem value={10}>1ère ingénierie + licence</MenuItem>
-    <MenuItem value={20}>1ère master + licence</MenuItem>
-    <MenuItem value={30}>1ère ingénierie + prepa</MenuItem>
+    <MenuItem value="1ère ingénierie + licence">1ère ingénierie + licence</MenuItem>
+    <MenuItem value="1ère master + licence">1ère master + licence</MenuItem>
+    <MenuItem value="1ère ingénierie + prepa">1ère ingénierie + prepa</MenuItem>
   </Select>
   </FormControl>
            <IconButton aria-label="Téléchargez votre logo"
@@ -123,9 +203,11 @@ export default function AddCandidat() {
         <input
           accept="file/*"
           type="file"
-          name = "icon"
+          name = "Relev1"
           hidden
-          id = "icon"
+          id = "Relev1"
+          required
+          onChange={handlCandidatureChange}
         />
           Télécharger votre 1er relevé
         </IconButton>
@@ -136,11 +218,13 @@ export default function AddCandidat() {
         >
           <FaIcons.FaFileUpload/>
         <input
-          accept="image/*"
+         accept="file/*"
           type="file"
-          name = "icon"
+          name = "Relev2"
           hidden
-          id = "icon"
+          id = "Relev2"
+          required
+          onChange={handlCandidatureChange}
         />
           Télécharger votre 2éme relevé
         </IconButton>
@@ -148,6 +232,7 @@ export default function AddCandidat() {
           <Button
             variant="contained"
             color="primary"
+            onClick = {submitCandidature}
             className={classes.submit}
             >
             Sauvegarder
@@ -157,11 +242,13 @@ export default function AddCandidat() {
             variant="contained"
             color="secondary"
             className={classes.cancel}
+            onClick = {newCandidature}
           >
             Annuler
           </Button>
           </div>
         </form>
+         )}
       </div>
     </Container>
     </ThemeProvider>

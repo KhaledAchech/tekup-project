@@ -17,6 +17,7 @@ def candidatureApi(request,id=0):
     elif request.method=='POST':
         candidature_data=JSONParser().parse(request)
         candidature_serializer=CandidatureSerializer(data=candidature_data)
+        print(candidature_serializer.is_valid())
         if candidature_serializer.is_valid():
             candidature_serializer.save()
             return JsonResponse("Added Successfully",safe=False)

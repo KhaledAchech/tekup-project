@@ -12,6 +12,8 @@ import Home from './components/pages/Home'
 import AppBarMenu from './components/elements/AppBar';
 import { ThemeProvider } from '@material-ui/core/styles';
 import theme from './Theme/theme';
+import { Container } from '@material-ui/core';
+import { textAlign } from '@mui/system';
 
 function App() {
   return (
@@ -33,6 +35,7 @@ function App() {
           </Route>
           <Route path="/candidatures">
              <AppBarMenu/>
+             
             <Candidature />
           </Route>
         </Switch>
