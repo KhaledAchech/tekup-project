@@ -11,6 +11,8 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
+import theme from '../../Theme/theme';
+import { ThemeProvider } from '@material-ui/styles';
 
 export default function AppBarMenu() {
   const [auth, setAuth] = React.useState(true);
@@ -29,9 +31,10 @@ export default function AppBarMenu() {
   };
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
+    <ThemeProvider theme={theme}>
 
-      <AppBar position="static">
+    <Box sx={{ flexGrow: 1 }} >
+      <AppBar position="static"  style={{ background: `${theme.palette.primary.main}` }}>
         <Toolbar>
         
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
@@ -71,5 +74,7 @@ export default function AppBarMenu() {
         </Toolbar>
       </AppBar>
     </Box>
+          
+    </ThemeProvider>
   );
 }

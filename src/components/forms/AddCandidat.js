@@ -13,6 +13,8 @@ import { Select } from '@material-ui/core';
 import { MenuItem } from '@material-ui/core';
 import FormControl from '@mui/material/FormControl';
 import OutlinedInput from '@mui/material/OutlinedInput';
+import theme from '../../Theme/theme';
+import { ThemeProvider } from '@material-ui/styles';
 
 
 // import DatePicker from '@material-ui/pickers'; 
@@ -64,7 +66,8 @@ export default function AddCandidat() {
 
   const classes = useStyles();
   return (
-    <Container component="main" maxWidth="xs">
+    <ThemeProvider theme={theme}>
+    <Container component="main" maxWidth="xs" >
       <CssBaseline />
       <div className={classes.paper}>
         <Typography component="h1" variant="h5">
@@ -118,7 +121,7 @@ export default function AddCandidat() {
         >
           <FaIcons.FaFileUpload/>
         <input
-          accept="image/*"
+          accept="file/*"
           type="file"
           name = "icon"
           hidden
@@ -161,5 +164,6 @@ export default function AddCandidat() {
         </form>
       </div>
     </Container>
+    </ThemeProvider>
   );
 }

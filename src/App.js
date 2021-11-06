@@ -1,36 +1,35 @@
-import logo from './logo.svg';
 import './App.css';
 import {
   BrowserRouter as Router,
   Switch,
   Route,
   Redirect,
-  Link
 } from "react-router-dom";
 
 import Candidat from './components/pages/Candidat';
 import Candidature from './components/pages/Candidature';
 import Home from './components/pages/Home'
 import AppBarMenu from './components/elements/AppBar';
+import { ThemeProvider } from '@material-ui/core/styles';
+import theme from './Theme/theme';
 
 function App() {
   return (
-    <div>
-      {/* <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-      </header> */}
+    <ThemeProvider theme={theme}>
+    <div color = {theme.palette.primary.light} >
+
       <Router>
         <Switch>
           <Route exact path="/">
             <Redirect to = "/home"/> 
              <Home/>
           </Route>
-        <Route  path="/home">
+        <Route path="/home">
             <Home/>
         </Route> 
         <Route path="/addCandidat">
             <AppBarMenu/>
-            <Candidat />
+            <Candidat/>
           </Route>
           <Route path="/candidatures">
              <AppBarMenu/>
@@ -39,6 +38,7 @@ function App() {
         </Switch>
       </Router>
     </div>
+    </ThemeProvider>
   );
 }
 
