@@ -2,12 +2,18 @@ import React, { useState } from "react";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
 
 const Login = () => {
+  BASE_URL = "";
+
   const [email, setEmail] = useState("");
   // const [nom variable, fonction qui chancge la valeur de la variable] = useState(valeur initiale)
   const [password, setPassword] = useState("");
   const login = (e) => {
     e.preventDefault();
     console.log(email, password);
+    const res = await axios.post(this.BASE_URL + "login", {
+      email: email,
+      password: password,
+    });
   };
   return (
     <Container fluid>
