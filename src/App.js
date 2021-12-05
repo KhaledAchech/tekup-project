@@ -8,6 +8,7 @@ import {
 
 import Candidat from './components/pages/Candidat';
 import Candidature from './components/pages/Candidature';
+import Candidats from './components/pages/Candidats';
 import Home from './components/pages/Home'
 import AppBarMenu from './components/elements/AppBar';
 import { ThemeProvider } from '@material-ui/core/styles';
@@ -35,8 +36,11 @@ function App() {
           </Route>
           <Route path="/candidatures">
              <AppBarMenu/>
-             
             <Candidature />
+          </Route>
+          <Route path="/candidats">
+             <AppBarMenu/>
+            <Candidats />
           </Route>
         </Switch>
       </Router>

@@ -6,6 +6,8 @@ from django.http.response import JsonResponse
 from api.models import Candidature
 from api.serializers import CandidatureSerializer
 
+from api.Extraction import ExtractionAlgorithm
+
 # Create your views here.
 
 @csrf_exempt
@@ -16,6 +18,10 @@ def candidatureApi(request,id=0):
         return JsonResponse(candidature_serializer.data,safe=False)
     elif request.method=='POST':
         candidature_data=JSONParser().parse(request)
+        score = ExtractionAlgorithm.getScore()
+        status = ExtractionAlgorithm.getStatus()
+        candidature_data["Status"] = status
+        candidature_data["Score"] = score
         candidature_serializer=CandidatureSerializer(data=candidature_data)
         print(candidature_serializer.is_valid())
         if candidature_serializer.is_valid():

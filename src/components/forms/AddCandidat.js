@@ -8,6 +8,13 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import { IconButton } from '@material-ui/core';
 import * as FaIcons from "react-icons/fa";
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
 import { InputLabel } from '@material-ui/core';
 import { Select } from '@material-ui/core';
 import { MenuItem } from '@material-ui/core';
@@ -19,8 +26,6 @@ import axios from "axios";
 
 
 // import DatePicker from '@material-ui/pickers'; 
-
-
 const useStyles = makeStyles((theme) => ({
   paper: {
     marginTop: theme.spacing(5),
@@ -52,10 +57,24 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function AddCandidat() {
+
+function createData(name, universityName,universityYear, academicBackground, Status) {
+  return { name, universityName, universityYear, academicBackground, Status };
+}
+
+
+
+const rows = [
+  createData('Syrine Nasr', 'TEK-UP', '2019-2020', '1ère ingénierie + licence', 'accepté'),
+];
+
+
   const [academicBackground, setAcademicBackground] = useState("");
   const [universityName, setUniversityName] = useState("");
   const [universityYear, setUniversityYear] = useState("");
-
+  const [errorUniversity, setErrorUniversity] = useState("");
+  const [errorUniversityYear, setErrorUniversityYear] = useState("");
+  const [errorUniversityParcours, setErrorUniversityParcours] = useState("");
 
 
   const handleChange = (event) => {
@@ -87,6 +106,7 @@ export default function AddCandidat() {
       };
       const [candidature, setCandidature] = useState(initialCandidatureState);
       const [submitted, setSubmitted] = useState(false);
+      const [shown, setShown] = useState(false);
       const handlCandidatureChange = (e) => {
         const { UniversityName, value } = e.target;
         setCandidature({ ...candidature, [UniversityName]: value });
@@ -101,7 +121,21 @@ export default function AddCandidat() {
           Status: "en cours",
           Score : "0%"
         };
-        console.log(data)
+        //console.log(data)
+
+        //validation : 
+        if (!universityName){
+          setErrorUniversity("Nom de l'université est un champs obligatoire.")
+          return;
+        }
+        if (!universityYear){
+          setErrorUniversityYear("L'année universitaire est un champs obligatoire.")
+          return;
+        }
+        if (!academicBackground){
+          setErrorUniversityParcours("Parcours universitaire est un champs obligatoire.")
+          return;
+        }
         axios
           .post("http://127.0.0.1:8000/candidature", data)
           .then((response) => {
@@ -116,6 +150,7 @@ export default function AddCandidat() {
               Score : response.data.score,
             });
             setSubmitted(true);
+            setShown(false);
             console.log(response.data);
           })
           .catch((e) => {
@@ -123,6 +158,17 @@ export default function AddCandidat() {
           });
       };
       const newCandidature = () => {
+        setShown(true);
+        setUniversityName("")
+        setUniversityYear("")
+        setAcademicBackground("")
+        setErrorUniversityParcours("")
+        setErrorUniversityYear("")
+        setErrorUniversity("")
+        // Relev1 = "Relev 1 "
+        // Relev2 = "Relev 2 "
+        // Status = "en cours"
+        // Score  = "0%"
         setCandidature(initialCandidatureState);
         setSubmitted(false);
       };
@@ -136,16 +182,57 @@ export default function AddCandidat() {
           Ajouter une candidature : 
         </Typography>
         {
-          submitted ? (
+          submitted || !shown ? (
             <div>
+              {
+              submitted ? (
               <div>
                 <Typography> Candidature Sauvegarder ! </Typography>
-
-              </div>
+              </div> ) : ( <div> </div>) }
               <Button onClick={newCandidature} color="primary">
                 Créer une nouvelle candidature ^^ .
               </Button>
-            </div>
+              <div>
+      {
+        submitted ? (
+          <div>
+          <span>
+          Status de votre candidature : 
+          </span>
+    <TableContainer component={Paper}>
+      <Table sx={{ minWidth: 650 }} aria-label="simple table">
+        <TableHead>
+          <TableRow>
+            <TableCell>Nom</TableCell>
+            <TableCell align="right">Nom de l'université</TableCell>
+            <TableCell align="right">Année universitaire</TableCell>
+            <TableCell align="right">Parcours universitaire</TableCell>
+            <TableCell align="right">status</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {rows.map((row) => (
+            <TableRow
+              key={row.name}
+              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+            >
+              <TableCell component="th" scope="row">
+                {row.name}
+              </TableCell>
+              <TableCell align="right">{row.universityName}</TableCell>
+              <TableCell align="right">{row.universityYear}</TableCell>
+              <TableCell align="right">{row.academicBackground}</TableCell>
+              <TableCell align="right">{row.Status}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+    </div>
+        ) : ( <div> </div> ) 
+      }
+    </div>
+    </div>
           ) : 
           (
         <form className={classes.form} noValidate action="#" encType="multipart/form-data">
@@ -159,9 +246,13 @@ export default function AddCandidat() {
             name="UniversityName"
             required
             value = {universityName}
-            onChange = { (e) => setUniversityName(e.target.value)}
+            onChange = { (e) => {
+              setUniversityName(e.target.value);
+              setErrorUniversity("");
+            }}
             autoComplete="Nom de l'université"
           />
+          <div style = {{color:"red"}}>{errorUniversity}</div>
  {/* <DatePicker
         views={["year"]}
         label="Year only"
@@ -171,28 +262,38 @@ export default function AddCandidat() {
       <TextField
             variant="outlined"
             margin="normal"
+            required
             fullWidth
             id="UniversityYear"
             label="Année universitaire"
             name="UniversityYear"
             value = {universityYear}
-            onChange = { (e) => setUniversityYear(e.target.value)}
+            onChange = { (e) => {
+              setUniversityYear(e.target.value);
+              setErrorUniversityYear("");
+            }
+          }
             autoComplete="Année universitaire"
           />
-           
+           <div style = {{color:"red"}}>{errorUniversityYear}</div>
            <FormControl sx={{ m: 1, width: 850, mt: 3 }}>
-           <InputLabel id="demo-simple-select-label">Parcours universitaire : </InputLabel>
+           <InputLabel id="demo-simple-select-label">Parcours universitaire* : </InputLabel>
   <Select
     labelId="demo-simple-select-label"
     id="AcademicBackground"
     // value={candidature.AcademicBackground}
-    onChange={ (e) => setAcademicBackground(e.target.value)}
+    onChange={ (e) => {
+      setAcademicBackground(e.target.value);
+      setErrorUniversityParcours("");
+    }
+    }
     input={<OutlinedInput label="Tag" />}
   >
     <MenuItem value="1ère ingénierie + licence">1ère ingénierie + licence</MenuItem>
     <MenuItem value="1ère master + licence">1ère master + licence</MenuItem>
     <MenuItem value="1ère ingénierie + prepa">1ère ingénierie + prepa</MenuItem>
   </Select>
+  <div style = {{color:"red"}}>{errorUniversityParcours}</div>
   </FormControl>
            <IconButton aria-label="Téléchargez votre logo"
           color="primary"
